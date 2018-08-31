@@ -38,11 +38,13 @@ public class RestConsentRepositoryTests extends BaseConsentRepositoryTests {
 
     @Override
     public ConsentRepository getRepository(final String testName) {
-        return repos.computeIfAbsent(testName, n -> {return new RestConsentRepository(new RestTemplate(), "/consent");});
+        return repos.computeIfAbsent(testName, n -> {
+            return new RestConsentRepository(new RestTemplate(), "/consent");
+        });
     }
 
-    private MockRestServiceServer getNewServer(RestConsentRepository repository) {
-        return MockRestServiceServer.bindTo(((RestConsentRepository)repository).getRestTemplate()).build();
+    private MockRestServiceServer getNewServer(final RestConsentRepository repository) {
+        return MockRestServiceServer.bindTo(repository.getRestTemplate()).build();
     }
 
     @Test
@@ -53,11 +55,11 @@ public class RestConsentRepositoryTests extends BaseConsentRepositoryTests {
         final String body;
         try {
             body = MAPPER.writeValueAsString(decision);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new AssertionError(e);
         }
         val repo = getRepository("verifyConsentDecisionIsNotFound");
-        val server = getNewServer((RestConsentRepository)repo);
+        val server = getNewServer((RestConsentRepository) repo);
         server.expect(manyTimes(), requestTo("/consent"))
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
@@ -78,11 +80,11 @@ public class RestConsentRepositoryTests extends BaseConsentRepositoryTests {
         final String body;
         try {
             body = MAPPER.writeValueAsString(decision);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             throw new AssertionError(e);
         }
         val repo = getRepository("verifyConsentDecisionIsFound");
-        val server = getNewServer((RestConsentRepository)repo);
+        val server = getNewServer((RestConsentRepository) repo);
         server.expect(once(), requestTo("/consent"))
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(body, MediaType.APPLICATION_JSON));
